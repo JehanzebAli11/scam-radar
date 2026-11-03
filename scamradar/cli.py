@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 import sys
 from collections.abc import Callable, Sequence
 from pathlib import Path
@@ -218,7 +219,9 @@ def cmd_train(args: argparse.Namespace) -> int:
             train_file=args.train_file,
             eval_file=args.eval_file,
             output_dir=args.output_dir,
-            resume_from_checkpoint=args.resume,
+            # spark-lab's job queue passes the newest checkpoint as LAB_RESUME_FROM
+            # after a crash, power cut or retry; an explicit --resume wins.
+            resume_from_checkpoint=args.resume or os.environ.get("LAB_RESUME_FROM") or None,
         )
     except ConfigError as exc:
         _err("config invalid:\n" + "\n".join(f"  - {e}" for e in exc.errors))
