@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Data is never committed. Only the fictional example seeds are tracked.
+data/*
+!data/seeds/
+data/seeds/*
+!data/seeds/seeds.example.jsonl
+
+# Locked human-labelled test set: never committed.
+eval/locked/*
+!eval/locked/README.md
+
+# Training / eval outputs
+runs/
+outputs/
+reports/
+checkpoints/
+*.joblib
+*.safetensors
+*.litertlm
+*.tflite

@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scam-radar"
+version = "0.1.0"
+description = "Data, training and evaluation pipeline for Scam Radar: an offline on-device scam classifier for SMS/WhatsApp messages (Roman Urdu, Urdu, English)."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Jehanzeb Ali", email = "jehanzebali111@gmail.com" }]
+dependencies = [
+  "httpx>=0.27",
+  "pyyaml>=6.0",
+  "numpy>=1.26",
+  "scikit-learn>=1.4",
+  "joblib>=1.3",
+]
+
+[project.optional-dependencies]
+train = [
+  "torch>=2.4",
+  "transformers>=4.53",
+  "trl>=0.20",
+  "datasets>=2.20",
+  "accelerate>=0.33",
+]
+dev = ["pytest>=8", "ruff>=0.5", "mypy>=1.10", "types-PyYAML"]
+
+[project.scripts]
+scamradar = "scamradar.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["scamradar*"]
+
+[tool.setuptools.package-data]
+"scamradar.train" = ["configs/*.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+warn_unused_ignores = true
