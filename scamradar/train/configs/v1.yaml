@@ -1,0 +1,30 @@
+# Scam Radar v1: full fine-tune of Gemma 3 270M on the DGX Spark.
+# Paths are relative to the working directory the command is run from.
+run_name: scamradar-v1
+model_id: google/gemma-3-270m-it
+
+train_file: data/train/train.jsonl     # teacher-labelled + real train-pool records
+eval_file: data/train/val.jsonl        # optional held-out slice of the train pool (NOT eval/locked)
+output_dir: runs/v1
+
+prompt_prefix: "Classify this message:"
+
+epochs: 3
+learning_rate: 5.0e-5
+batch_size: 16                 # per device
+gradient_accumulation_steps: 1
+max_length: 256                # tokens, prompt + completion
+bf16: true
+lr_scheduler: cosine
+warmup_ratio: 0.03
+weight_decay: 0.0
+gradient_checkpointing: false
+seed: 13
+
+save_steps: 200                # checkpoint every N optimiser steps
+save_total_limit: 5
+logging_steps: 10
+eval_steps: 200
+
+# null = fresh start; "latest" = newest checkpoint in output_dir; or a path.
+resume_from_checkpoint: null
