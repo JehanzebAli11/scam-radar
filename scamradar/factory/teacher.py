@@ -65,6 +65,11 @@ def check_endpoint_allowed(base_url: str) -> None:
             )
 
 
+def is_loopback(base_url: str) -> bool:
+    host = (urlparse(base_url).hostname or "").lower()
+    return host in ("localhost", "::1") or host.startswith("127.")
+
+
 def prompt_hash(messages: list[Message]) -> str:
     """Stable short hash of a prompt, recorded for provenance."""
     blob = json.dumps(messages, ensure_ascii=False, sort_keys=True).encode("utf-8")
@@ -87,7 +92,12 @@ class OpenAICompatibleClient:
         check_endpoint_allowed(self.base_url)
         headers = {"Authorization": f"Bearer {self.api_key}"} if self.api_key else {}
         self._client = httpx.Client(
-            base_url=self.base_url, timeout=self.timeout, headers=headers, transport=self.transport
+            base_url=self.base_url,
+            timeout=self.timeout,
+            headers=headers,
+            transport=self.transport,
+            # A local teacher must never be routed through an HTTP(S)_PROXY.
+            trust_env=not is_loopback(self.base_url),
         )
 
     @classmethod

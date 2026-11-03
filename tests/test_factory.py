@@ -22,6 +22,7 @@ from scamradar.factory.teacher import (
     ForbiddenEndpointError,
     OpenAICompatibleClient,
     check_endpoint_allowed,
+    is_loopback,
     prompt_hash,
 )
 from scamradar.io import read_records
@@ -92,6 +93,12 @@ def test_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
     c = OpenAICompatibleClient.from_env()
     assert (c.base_url, c.model) == ("http://127.0.0.1:9000/v1", "x/y")
     assert OpenAICompatibleClient.from_env(model="override").model == "override"
+
+
+def test_loopback_detection() -> None:
+    assert is_loopback("http://localhost:8000/v1")
+    assert is_loopback("http://127.0.0.1:8000/v1")
+    assert not is_loopback("http://spark.lan:8000/v1")
 
 
 def test_prompt_hash_stable() -> None:
