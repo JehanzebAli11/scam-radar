@@ -91,7 +91,9 @@ class OpenAICompatibleClient:
         )
 
     @classmethod
-    def from_env(cls, base_url: str | None = None, model: str | None = None) -> OpenAICompatibleClient:
+    def from_env(
+        cls, base_url: str | None = None, model: str | None = None
+    ) -> OpenAICompatibleClient:
         return cls(
             base_url=base_url or os.environ.get(ENV_BASE_URL, DEFAULT_BASE_URL),
             model=model or os.environ.get(ENV_MODEL, DEFAULT_TEACHER_MODEL),

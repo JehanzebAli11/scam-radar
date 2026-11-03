@@ -107,6 +107,6 @@ def dedupe(records: Sequence[Record], config: DedupeConfig | None = None) -> Ded
             continue
         kept_idx.append(i)
         kept_sh[i] = sh
-        for key in band_keys:
-            buckets[key].append(i)
+        for band_key in band_keys:
+            buckets[band_key].append(i)
     return DedupeResult(kept=[unique[i] for i in kept_idx], exact_dupes=exact, near_dupes=near)

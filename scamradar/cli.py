@@ -8,10 +8,15 @@ import logging
 import sys
 from collections.abc import Callable, Sequence
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from scamradar import __version__
 from scamradar.io import read_records, write_json, write_jsonl, write_text
 from scamradar.schema import validate_line
+
+if TYPE_CHECKING:
+    from scamradar.factory.teacher import ChatClient
+    from scamradar.predictor import Predictor
 
 Handler = Callable[[argparse.Namespace], int]
 
@@ -69,7 +74,10 @@ def cmd_split(args: argparse.Namespace) -> int:
     from scamradar.split import split_files
 
     res = split_files(
-        args.input, args.train_out, args.locked_out, test_fraction=args.test_fraction,
+        args.input,
+        args.train_out,
+        args.locked_out,
+        test_fraction=args.test_fraction,
         seed=args.seed,
     )
     _out(f"train pool: {len(res.train)} -> {args.train_out}")
@@ -80,7 +88,7 @@ def cmd_split(args: argparse.Namespace) -> int:
 # --- factory ----------------------------------------------------------------
 
 
-def _teacher(args: argparse.Namespace):  # type: ignore[no-untyped-def]
+def _teacher(args: argparse.Namespace) -> ChatClient:
     from scamradar.factory.teacher import OpenAICompatibleClient
 
     return OpenAICompatibleClient.from_env(base_url=args.base_url, model=args.model)
@@ -170,7 +178,7 @@ def cmd_predict(args: argparse.Namespace) -> int:
     return 0
 
 
-def _write_predictions(predictor, input_path: str, output: str | None) -> None:  # type: ignore[no-untyped-def]
+def _write_predictions(predictor: Predictor, input_path: str, output: str | None) -> None:
     # Predicting on the locked set is part of evaluation, so inputs are loaded
     # through the harness (the only reader allowed in eval/locked/).
     from scamradar.eval.harness import load_inputs, predict_records
@@ -206,8 +214,11 @@ def cmd_train(args: argparse.Namespace) -> int:
 
     try:
         cfg = load_config(
-            args.config, train_file=args.train_file, eval_file=args.eval_file,
-            output_dir=args.output_dir, resume_from_checkpoint=args.resume,
+            args.config,
+            train_file=args.train_file,
+            eval_file=args.eval_file,
+            output_dir=args.output_dir,
+            resume_from_checkpoint=args.resume,
         )
     except ConfigError as exc:
         _err("config invalid:\n" + "\n".join(f"  - {e}" for e in exc.errors))
@@ -225,7 +236,9 @@ def cmd_train(args: argparse.Namespace) -> int:
 
 def _add_teacher_args(p: argparse.ArgumentParser) -> None:
     p.add_argument("--base-url", default=None, help="teacher endpoint (default: localhost:8000/v1)")
-    p.add_argument("--model", default=None, help="teacher model id (default: google/gemma-4-31b-it)")
+    p.add_argument(
+        "--model", default=None, help="teacher model id (default: google/gemma-4-31b-it)"
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:

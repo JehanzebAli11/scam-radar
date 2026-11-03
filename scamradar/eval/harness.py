@@ -188,8 +188,8 @@ def render_markdown(report: EvalReport) -> str:
     lines += ["", "### Label confusion (rows = gold)", ""]
     cols = ["safe", "promo", "scam", "invalid"]
     lines += ["| gold \\ pred | " + " | ".join(cols) + " |", "|---" * (len(cols) + 1) + "|"]
-    for gold, row in m.confusion.items():
-        lines.append(f"| {gold} | " + " | ".join(str(row.get(c, 0)) for c in cols) + " |")
+    for gold, counts in m.confusion.items():
+        lines.append(f"| {gold} | " + " | ".join(str(counts.get(c, 0)) for c in cols) + " |")
     return "\n".join(lines) + "\n"
 
 

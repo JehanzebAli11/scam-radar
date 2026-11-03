@@ -1,0 +1,32 @@
+{"id": "fx-001", "text": "Ghalti se code aap ke number par chala gaya, wapis bhej dein jaldi", "label": "scam|code_theft|asks_for_code,urgency"}
+{"id": "fx-002", "text": "Bhai mera code aap ko aa gaya hai please forward kar do", "label": "scam|code_theft|asks_for_code"}
+{"id": "fx-003", "text": "You got a WhatsApp code by mistake, send it to me now", "label": "scam|code_theft|asks_for_code,urgency"}
+{"id": "fx-004", "text": "Verification code share karein warna account band", "label": "scam|code_theft|asks_for_code,urgency"}
+{"id": "fx-005", "text": "BISP ki raqam ke liye 1000 fee is number par bhejein", "label": "scam|fake_govt_aid|asks_for_money,claims_official"}
+{"id": "fx-006", "text": "Ehsaas imdad mazoor, 500 registration fee JazzCash karein", "label": "scam|fake_govt_aid|asks_for_money,claims_official"}
+{"id": "fx-007", "text": "PM relief 30000 approved, pay processing fee today", "label": "scam|fake_govt_aid|asks_for_money,urgency,claims_official"}
+{"id": "fx-008", "text": "Govt aid program mein naam aya hai, fee bhejein", "label": "scam|fake_govt_aid|asks_for_money,claims_official"}
+{"id": "fx-009", "text": "Mubarak ho aap ne lucky draw mein bike jeet li, tax 3000 bhejein", "label": "scam|fake_prize|asks_for_money"}
+{"id": "fx-010", "text": "Congratulations you won 5 lakh prize, pay claim fee", "label": "scam|fake_prize|asks_for_money"}
+{"id": "fx-011", "text": "Inaam jeeta hai, claim ke liye 2000 jama karwayen", "label": "scam|fake_prize|asks_for_money"}
+{"id": "fx-012", "text": "Lucky draw winner! iPhone claim karne ke liye fee bhejein", "label": "scam|fake_prize|asks_for_money"}
+{"id": "fx-013", "text": "Click http://parcel-fix.example/a to update address", "label": "scam|phishing_link|has_link"}
+{"id": "fx-014", "text": "Tax refund pending, submit details at https://refund.example/x", "label": "scam|phishing_link|has_link,claims_official"}
+{"id": "fx-015", "text": "SIM band ho jayegi, verify here http://sim.example/v", "label": "scam|phishing_link|has_link,urgency"}
+{"id": "fx-016", "text": "Your account login expired, sign in at http://login.example/p", "label": "scam|phishing_link|has_link,urgency"}
+{"id": "fx-017", "text": "Your OTP is 000000. Do not share this code with anyone.", "label": "safe|none|claims_official", "tags": ["otp"]}
+{"id": "fx-018", "text": "Aap ka login code 000000 hai, kisi ko na batayen", "label": "safe|none|claims_official", "tags": ["otp"]}
+{"id": "fx-019", "text": "OTP 000000 for your transaction. Bank never asks for it.", "label": "safe|none|claims_official", "tags": ["otp"]}
+{"id": "fx-020", "text": "Code 000000 kisi ke saath share na karein", "label": "safe|none|claims_official", "tags": ["otp"]}
+{"id": "fx-021", "text": "Ammi main 8 baje ghar aa jaunga", "label": "safe|none|none"}
+{"id": "fx-022", "text": "Kal cricket khelne chalein ge?", "label": "safe|none|none"}
+{"id": "fx-023", "text": "Meeting is moved to 3pm tomorrow", "label": "safe|none|none"}
+{"id": "fx-024", "text": "Khana kha liya? Main thori dair mein call karta hoon", "label": "safe|none|none"}
+{"id": "fx-025", "text": "Bijli ka bill 4000 hai, last date 15", "label": "safe|none|claims_official"}
+{"id": "fx-026", "text": "Your parcel FX0000 will be delivered today", "label": "safe|none|claims_official"}
+{"id": "fx-027", "text": "Sirf 99 mein 5GB bundle, dial *000#", "label": "promo|none|claims_official"}
+{"id": "fx-028", "text": "Mega sale 40% off this weekend", "label": "promo|none|none"}
+{"id": "fx-029", "text": "Pizza deal 999 mein do pizza", "label": "promo|none|none"}
+{"id": "fx-030", "text": "Recharge 500 aur paayen 2GB free", "label": "promo|none|claims_official"}
+{"id": "fx-031", "text": "New collection arrived, visit our store", "label": "promo|none|none"}
+{"id": "fx-032", "text": "Weekend offer: buy 1 get 1 free on shoes", "label": "promo|none|none"}

@@ -52,10 +52,7 @@ def read_records(path: str | os.PathLike[str], *, allow_locked: bool = False) ->
     p = Path(path)
     if not allow_locked:
         ensure_not_locked(p, "read")
-    if p.suffix.lower() == ".csv":
-        records = list(_iter_csv(p))
-    else:
-        records = list(_iter_jsonl(p))
+    records = list(_iter_csv(p) if p.suffix.lower() == ".csv" else _iter_jsonl(p))
     for i, rec in enumerate(records):
         if "text" not in rec or not isinstance(rec["text"], str):
             raise ValueError(f"{p}: record {i} has no 'text' string")

@@ -58,10 +58,10 @@ PHONE_RE = re.compile(
     rf"(?:\+|00)?92{_SEP}\(?0?\)?{_SEP}3\d{{2}}{_SEP}\d{{3}}{_SEP}?\d{{4}}"
     # mobile: 03xx-xxxxxxx / 03xx xxx xxxx / 03xxxxxxxxx
     rf"|03\d{{2}}{_SEP}\d{{3}}{_SEP}?\d{{4}}"
-    # landline with country code: +92 21 34567890 / +92-42-3576-1234
-    rf"|(?:\+|00)92{_SEP}\(?[1-9]\d{{1,2}}\)?{_SEP}\d{{3,4}}{_SEP}?\d{{3,4}}"
+    # landline with country code (area codes never start with 3): +92 21 34567890
+    rf"|(?:\+|00)92{_SEP}(?:\([1-24-9]\d{{1,2}}\)|[1-24-9]\d{{1,2}}){_SEP}\d{{3,4}}{_SEP}?\d{{3,4}}"
     # landline with trunk prefix and explicit separator: 021-34567890 / (042) 35761234
-    r"|\(?0[1-9]\d{1,2}\)?[\s-]\d{3,4}[\s-]?\d{3,4}"
+    r"|(?:\(0[1-24-9]\d{1,2}\)|0[1-24-9]\d{1,2})[\s-]\d{3,4}[\s-]?\d{3,4}"
     r")(?![\d])"
 )
 

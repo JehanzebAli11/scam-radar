@@ -103,9 +103,7 @@ def train(cfg: TrainConfig) -> str:  # pragma: no cover - needs GPU + model weig
         from transformers import AutoModelForCausalLM, AutoTokenizer
         from trl import SFTConfig, SFTTrainer
     except ImportError as exc:
-        raise SystemExit(
-            "training needs the optional deps: pip install -e '.[train]'"
-        ) from exc
+        raise SystemExit("training needs the optional deps: pip install -e '.[train]'") from exc
 
     report = dry_run(cfg)
     if not report.ok:

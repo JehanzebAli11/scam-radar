@@ -182,24 +182,38 @@ def _le(v: float | None, t: float) -> bool | None:
 def check_targets(model: Metrics, baseline: Metrics | None = None) -> list[TargetResult]:
     results = [
         TargetResult(
-            "scam_recall", model.scam_recall, f">= {TARGET_SCAM_RECALL:.2f}",
+            "scam_recall",
+            model.scam_recall,
+            f">= {TARGET_SCAM_RECALL:.2f}",
             _ge(model.scam_recall, TARGET_SCAM_RECALL),
         ),
         TargetResult(
-            "false_alarm_rate", model.false_alarm_rate, f"<= {TARGET_FALSE_ALARM:.2f}",
+            "false_alarm_rate",
+            model.false_alarm_rate,
+            f"<= {TARGET_FALSE_ALARM:.2f}",
             _le(model.false_alarm_rate, TARGET_FALSE_ALARM),
         ),
         TargetResult(
-            "false_alarm_rate_otp", model.false_alarm_rate_otp, f"<= {TARGET_FALSE_ALARM:.2f}",
+            "false_alarm_rate_otp",
+            model.false_alarm_rate_otp,
+            f"<= {TARGET_FALSE_ALARM:.2f}",
             _le(model.false_alarm_rate_otp, TARGET_FALSE_ALARM),
         ),
         TargetResult(
-            "scam_type_accuracy", model.scam_type_accuracy, f">= {TARGET_TYPE_ACCURACY:.2f}",
+            "scam_type_accuracy",
+            model.scam_type_accuracy,
+            f">= {TARGET_TYPE_ACCURACY:.2f}",
             _ge(model.scam_type_accuracy, TARGET_TYPE_ACCURACY),
         ),
     ]
-    results.append(TargetResult("beats_tfidf_baseline", None, "no worse on recall, "
-                                "false alarms, type accuracy", beats_baseline(model, baseline)))
+    results.append(
+        TargetResult(
+            "beats_tfidf_baseline",
+            None,
+            "no worse on recall, false alarms, type accuracy",
+            beats_baseline(model, baseline),
+        )
+    )
     return results
 
 
@@ -216,4 +230,3 @@ def beats_baseline(model: Metrics, baseline: Metrics | None) -> bool | None:
     if not measurable:
         return None
     return all((m - b) * s >= -1e-12 for m, b, s in measurable)
-

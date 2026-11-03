@@ -114,8 +114,10 @@ def validate_line(line: str) -> list[str]:
         if len(set(items)) != len(items):
             errors.append("duplicate flags")
         known = [f for f in items if f in _FLAG_RANK]
-        if not unknown and len(set(items)) == len(items) and known != sorted(
-            known, key=_FLAG_RANK.__getitem__
+        if (
+            not unknown
+            and len(set(items)) == len(items)
+            and known != sorted(known, key=_FLAG_RANK.__getitem__)
         ):
             errors.append(f"flags not in canonical order {list(FLAG_ORDER)}")
     return errors

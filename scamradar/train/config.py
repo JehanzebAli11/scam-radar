@@ -56,8 +56,14 @@ class TrainConfig:
             errors.append("epochs must be > 0")
         if not 0 < self.learning_rate < 1:
             errors.append("learning_rate must be in (0, 1)")
-        for name in ("batch_size", "gradient_accumulation_steps", "max_length", "save_steps",
-                     "logging_steps", "eval_steps"):
+        for name in (
+            "batch_size",
+            "gradient_accumulation_steps",
+            "max_length",
+            "save_steps",
+            "logging_steps",
+            "eval_steps",
+        ):
             if int(getattr(self, name)) <= 0:
                 errors.append(f"{name} must be a positive integer")
         if not 0 <= self.warmup_ratio < 1:

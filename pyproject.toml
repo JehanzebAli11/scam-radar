@@ -47,6 +47,8 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+# SIM905 rewrites compact """...""".split() word lists into one item per line.
+ignore = ["SIM905"]
 
 [tool.mypy]
 python_version = "3.11"
