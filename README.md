@@ -70,6 +70,9 @@ train pool ───────────────────────
    to beat it to be worth shipping.
 6. **Export.** Convert to `.litertlm` for LiteRT-LM on Android. See
    [`export/README.md`](export/README.md).
+7. **App.** [`app/`](app/README.md) runs the `.litertlm` file fully offline,
+   with a rule layer in front of the model and pre-written Urdu/English
+   advice cards.
 
 ## Quickstart
 
@@ -175,6 +178,7 @@ scamradar/
   cli.py               `scamradar` entry point
 data/seeds/seeds.example.jsonl   45 fictional seeds: 3 per scam type and safe/promo/hard-negative category
 eval/locked/           locked test set (git-ignored)
+app/                   Android app (Kotlin, Compose, LiteRT-LM); see app/README.md
 export/README.md       .litertlm conversion
 tests/                 pytest suite (fake teacher, tiny fixtures)
 ```

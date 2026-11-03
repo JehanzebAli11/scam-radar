@@ -52,7 +52,9 @@ scamradar validate --line "$(litert-lm run <local .litertlm args> \
 ```
 
 Then measure latency on a real Android device (the number that matters for the
-app), not on the Spark.
+app), not on the Spark. To load the file in the app, push it as
+`scamradar.litertlm` to the app's storage; see
+[`app/README.md`](../app/README.md#4-push-the-model).
 
 ## ARM64 fallback (DGX Spark)
 
