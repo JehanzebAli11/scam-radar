@@ -32,7 +32,8 @@ EMAIL_RE = re.compile(r"(?<![\w.+-])[\w.+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.
 
 _TLDS = (
     "com|pk|net|org|info|biz|xyz|top|online|site|website|club|shop|store|live|link|"
-    "click|ly|co|me|io|app|in|tk|ml|ga|cf|gq|cc|ws|vip|win|buzz|icu|tv|us|uk"
+    "click|ly|co|me|io|app|in|tk|ml|ga|cf|gq|cc|ws|vip|win|buzz|icu|tv|us|uk|"
+    "example|test|invalid"
 )
 URL_RE = re.compile(
     r"(?P<scheme>https?://)?"
