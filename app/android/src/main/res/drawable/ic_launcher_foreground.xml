@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Radar rings with a sweep line. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="3" android:fillColor="#00000000"
+        android:pathData="M54,30a24,24 0,1 1,0 48a24,24 0,1 1,0 -48z" />
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="3" android:fillColor="#00000000"
+        android:pathData="M54,42a12,12 0,1 1,0 24a12,12 0,1 1,0 -24z" />
+    <path android:strokeColor="#F4D35E" android:strokeWidth="4" android:fillColor="#00000000"
+        android:strokeLineCap="round" android:pathData="M54,54L71,37" />
+    <path android:fillColor="#EE964B" android:pathData="M68,62a4,4 0,1 1,0 8a4,4 0,1 1,0 -8z" />
+</vector>

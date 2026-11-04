@@ -1,0 +1,38 @@
+{"line": "safe|none|none", "strict_valid": true, "lenient": "safe|none|none"}
+{"line": "promo|none|none", "strict_valid": true, "lenient": "promo|none|none"}
+{"line": "promo|none|claims_official", "strict_valid": true, "lenient": "promo|none|claims_official"}
+{"line": "scam|code_theft|asks_for_code,urgency", "strict_valid": true, "lenient": "scam|code_theft|asks_for_code,urgency"}
+{"line": "scam|phishing_link|has_link", "strict_valid": true, "lenient": "scam|phishing_link|has_link"}
+{"line": "scam|fake_govt_aid|asks_for_money,urgency,claims_official", "strict_valid": true, "lenient": "scam|fake_govt_aid|asks_for_money,urgency,claims_official"}
+{"line": "scam|other|asks_for_code,asks_for_money,has_link,urgency,claims_official", "strict_valid": true, "lenient": "scam|other|asks_for_code,asks_for_money,has_link,urgency,claims_official"}
+{"line": "scam|fake_govt_aid|none", "strict_valid": true, "lenient": "scam|fake_govt_aid|none"}
+{"line": "scam|fake_prize|none", "strict_valid": true, "lenient": "scam|fake_prize|none"}
+{"line": "scam|code_theft|none", "strict_valid": true, "lenient": "scam|code_theft|none"}
+{"line": "scam|bank_or_wallet_impersonation|none", "strict_valid": true, "lenient": "scam|bank_or_wallet_impersonation|none"}
+{"line": "scam|family_emergency|none", "strict_valid": true, "lenient": "scam|family_emergency|none"}
+{"line": "scam|fake_job_or_investment|none", "strict_valid": true, "lenient": "scam|fake_job_or_investment|none"}
+{"line": "scam|phishing_link|none", "strict_valid": true, "lenient": "scam|phishing_link|none"}
+{"line": "scam|other|none", "strict_valid": true, "lenient": "scam|other|none"}
+{"line": "scam|none|none", "strict_valid": false, "lenient": null}
+{"line": "safe|code_theft|none", "strict_valid": false, "lenient": "safe|none|none"}
+{"line": "spam|none|none", "strict_valid": false, "lenient": null}
+{"line": "scam|lottery|none", "strict_valid": false, "lenient": null}
+{"line": "safe|none|", "strict_valid": false, "lenient": "safe|none|none"}
+{"line": "safe|none|wat", "strict_valid": false, "lenient": null}
+{"line": "safe|none|none,urgency", "strict_valid": false, "lenient": null}
+{"line": "scam|code_theft|urgency,asks_for_code", "strict_valid": false, "lenient": "scam|code_theft|asks_for_code,urgency"}
+{"line": "scam|code_theft|urgency,urgency", "strict_valid": false, "lenient": "scam|code_theft|urgency"}
+{"line": "safe|none", "strict_valid": false, "lenient": null}
+{"line": "safe|none|none|x", "strict_valid": false, "lenient": null}
+{"line": " safe|none|none", "strict_valid": false, "lenient": "safe|none|none"}
+{"line": "SAFE|none|none", "strict_valid": false, "lenient": "safe|none|none"}
+{"line": "Scam | Code_Theft | Urgency , asks_for_code", "strict_valid": false, "lenient": "scam|code_theft|asks_for_code,urgency"}
+{"line": "`scam|fake_prize|asks_for_money`", "strict_valid": false, "lenient": "scam|fake_prize|asks_for_money"}
+{"line": "scam|fake_prize|asks_for_money\nThis message offers a prize.", "strict_valid": false, "lenient": "scam|fake_prize|asks_for_money"}
+{"line": "safe|none|none\n", "strict_valid": false, "lenient": "safe|none|none"}
+{"line": "promo|none|has_link,", "strict_valid": false, "lenient": "promo|none|has_link"}
+{"line": "scam|family_emergency|asks_for_money,,urgency", "strict_valid": false, "lenient": "scam|family_emergency|asks_for_money,urgency"}
+{"line": "", "strict_valid": false, "lenient": null}
+{"line": "   ", "strict_valid": false, "lenient": null}
+{"line": "I think this is a scam.", "strict_valid": false, "lenient": null}
+{"line": "scam|phishing_link|has_link|extra", "strict_valid": false, "lenient": null}

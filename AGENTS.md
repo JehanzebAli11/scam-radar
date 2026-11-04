@@ -45,5 +45,12 @@ Hugging Face access.
   guard. Only `scamradar/eval/harness.py` passes `allow_locked=True`.
 - The compact line format and canonical flag order live in
   `scamradar/schema.py`. The training prompt lives in `scamradar/prompting.py`.
-  Change either only together with the eval harness and the export notes.
+  Change either only together with the eval harness, the export notes and
+  the Android app's Kotlin mirror (`app/core/.../Schema.kt`, `Prompt.kt`).
+  `tests/test_schema_vectors.py` and the app's `SchemaTest` both check
+  `tests/fixtures/schema_vectors.jsonl`; regenerate it with
+  `python -m tests.test_schema_vectors` after a schema change.
+- The Android app lives in `app/` (Gradle, see `app/README.md`). Its advice
+  text is pre-written in `app/core/.../text/AdviceText.kt`; never show
+  model-written text to the user. The app has no INTERNET permission.
 - Commit with clear messages; never commit data, checkpoints or model files.

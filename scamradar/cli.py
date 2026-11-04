@@ -179,6 +179,27 @@ def cmd_predict(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_predict_litertlm(args: argparse.Namespace) -> int:
+    from scamradar.baselines.litertlm_predictor import LiteRtLmPredictor
+
+    predictor = LiteRtLmPredictor(
+        args.model,
+        max_num_tokens=args.max_num_tokens or None,
+        backend=args.backend,
+    )
+    try:
+        _write_predictions(predictor, args.input, args.output)
+    finally:
+        predictor.close()
+    assert predictor.stats is not None
+    summary = predictor.stats.summary()
+    if args.stats:
+        write_json(args.stats, summary)
+        _out(f"wrote run stats -> {args.stats}")
+    _out(json.dumps(summary, indent=2))
+    return 0
+
+
 def _write_predictions(predictor: Predictor, input_path: str, output: str | None) -> None:
     # Predicting on the locked set is part of evaluation, so inputs are loaded
     # through the harness (the only reader allowed in eval/locked/).
@@ -189,6 +210,17 @@ def _write_predictions(predictor: Predictor, input_path: str, output: str | None
     preds = predict_records(predictor, load_inputs(input_path))
     write_jsonl(output, preds.values())
     _out(f"wrote {len(preds)} predictions -> {output}")
+
+
+def cmd_compare_exports(args: argparse.Namespace) -> int:
+    from scamradar.export_compare import load_row, to_markdown
+
+    table = to_markdown([load_row(d) for d in args.dirs])
+    if args.markdown:
+        write_text(args.markdown, table)
+        _out(f"wrote {args.markdown}")
+    _out(table)
+    return 0
 
 
 # --- eval -------------------------------------------------------------------
@@ -317,6 +349,31 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--base-url", default=DEFAULT_BASE_URL)
     p.add_argument("--model", default=DEFAULT_BASE_MODEL)
     p.add_argument("--style", choices=PROMPT_STYLES, default="few_shot")
+
+    p = add(
+        "predict-litertlm",
+        cmd_predict_litertlm,
+        "run an exported .litertlm file directly (as the app does); records size, RAM, latency",
+    )
+    p.add_argument("input")
+    p.add_argument("-o", "--output", required=True)
+    p.add_argument("--model", required=True, help="path to the .litertlm file")
+    p.add_argument(
+        "--max-num-tokens",
+        type=int,
+        default=512,
+        help="KV-cache size; 0 = the model/engine default (the app uses 512)",
+    )
+    p.add_argument("--backend", choices=("cpu", "gpu"), default="cpu")
+    p.add_argument("--stats", help="write run stats JSON here (file size, RAM, latency)")
+
+    p = add(
+        "compare-exports",
+        cmd_compare_exports,
+        "table of exports: file size, RAM, latency and eval metrics side by side",
+    )
+    p.add_argument("dirs", nargs="+", help="experiment dirs with stats.json / eval.json")
+    p.add_argument("--markdown", help="also write the table here")
 
     p = add("eval", cmd_eval, "score predictions against gold; report targets")
     p.add_argument("--gold", default="eval/locked/test.jsonl")
