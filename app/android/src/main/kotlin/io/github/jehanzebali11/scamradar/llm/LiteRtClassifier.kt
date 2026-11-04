@@ -7,6 +7,7 @@ import com.google.ai.edge.litertlm.ConversationConfig
 import com.google.ai.edge.litertlm.Engine
 import com.google.ai.edge.litertlm.EngineConfig
 import com.google.ai.edge.litertlm.SamplerConfig
+import io.github.jehanzebali11.scamradar.BuildConfig
 import io.github.jehanzebali11.scamradar.core.Prompt
 import io.github.jehanzebali11.scamradar.core.classify.MessageClassifier
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +37,7 @@ class LiteRtClassifier private constructor(
         mutex.withLock {
             withContext(Dispatchers.Default) {
                 engine.createConversation(CONVERSATION_CONFIG).use { conversation ->
-                    conversation.sendMessage(Contents.of(Prompt.userContent(text))).toString()
+                    conversation.sendMessage(Contents.of(Prompt.userContent(text)), maxOutputToken = MAX_OUTPUT_TOKENS).toString()
                 }
             }
         }
@@ -45,6 +46,18 @@ class LiteRtClassifier private constructor(
 
     companion object {
         private const val TAG = "LiteRtClassifier"
+
+        /**
+         * KV-cache size (input + output tokens). A message plus its answer is under
+         * ~300 tokens (training used max length 256), so 512 is plenty; without it
+         * LiteRT-LM asks for 4096. If the .litertlm was exported with a smaller
+         * fixed cache, the engine uses that instead. 0 = engine/model default.
+         * Set per build for the memory experiment (see export/README.md).
+         */
+        val MAX_NUM_TOKENS: Int? = BuildConfig.MODEL_MAX_TOKENS.takeIf { it > 0 }
+
+        /** The longest compact line is well under this many tokens. */
+        const val MAX_OUTPUT_TOKENS = 48
 
         /**
          * Greedy decoding (topK = 1): the answer is one short deterministic line.
@@ -65,7 +78,9 @@ class LiteRtClassifier private constructor(
                 }
             var last: Throwable? = null
             for ((name, backend) in attempts) {
-                val engine = Engine(EngineConfig(modelPath = modelPath, backend = backend(), cacheDir = cacheDir))
+                val engine = Engine(
+                        EngineConfig(modelPath = modelPath, backend = backend(), cacheDir = cacheDir, maxNumTokens = MAX_NUM_TOKENS),
+                    )
                 try {
                     engine.initialize()
                     Log.i(TAG, "model loaded on $name")

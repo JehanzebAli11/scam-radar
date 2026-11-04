@@ -17,6 +17,11 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // LiteRT-LM ships arm64-v8a (phones) and x86_64 (emulator) native libraries.
         ndk { abiFilters += listOf("arm64-v8a", "x86_64") }
+        // KV-cache cap passed to LiteRT-LM (message + answer is under ~300 tokens).
+        // Override for the memory experiment: ./gradlew assembleDebug -PscamradarMaxTokens=0
+        // (0 = use the model/engine default). See export/README.md.
+        val maxTokens = (project.findProperty("scamradarMaxTokens") as String?)?.toInt() ?: 512
+        buildConfigField("int", "MODEL_MAX_TOKENS", maxTokens.toString())
     }
 
     buildTypes {
@@ -31,7 +36,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    buildFeatures { compose = true }
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
 
     packaging {
         // The model is never bundled in the APK; it is pushed to app storage (see README).

@@ -168,6 +168,8 @@ scamradar/
   baselines/
     tfidf.py           char n-gram TF-IDF + logistic regression (joblib)
     prompt_baseline.py base or fine-tuned model via the endpoint
+    litertlm_predictor.py  run an exported .litertlm directly; records size/RAM/latency
+  export_compare.py    `compare-exports`: accuracy and cost per export, one table
   eval/
     metrics.py         target metrics and pass/fail
     harness.py         gold + predictions -> markdown + JSON report
