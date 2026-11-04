@@ -182,6 +182,20 @@ disclosure → *I understand, continue* → allow Scam Radar notifications
 fictional scam SMS from another phone; a "Likely scam" notification should
 appear, and tapping it opens the full card.
 
+### 6. Demo video without a device
+
+`tools/make_demo_video.sh` drives the real screens with Robolectric on the JVM
+(demo mode, fictional messages), saves frames, and builds a captioned MP4 with
+ffmpeg (needs Python 3 with Pillow, and ffmpeg). It is a rendering of the app
+UI, not an emulator recording: no system share sheet, notifications or model.
+
+```bash
+tools/make_demo_video.sh build/scamradar-demo.mp4
+```
+
+The frames come from `android/src/test/.../demo/DemoVideoTest.kt`, which is
+skipped in normal test runs unless `-Dscamradar.demoFrames=<dir>` is set.
+
 ## What was verified, and what was not
 
 Verified in a Linux (x86_64) sandbox with no device:

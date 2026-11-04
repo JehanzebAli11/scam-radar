@@ -38,7 +38,16 @@ android {
         jniLibs { useLegacyPackaging = false }
     }
 
-    testOptions { unitTests.isReturnDefaultValues = true }
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+        unitTests.isIncludeAndroidResources = true // Robolectric UI tests
+        unitTests.all { test ->
+            // Demo-video frames are only written when asked for (see app/tools/make_demo_video.sh).
+            for (key in listOf("scamradar.demoFrames", "robolectric.dependency.repo.url")) {
+                System.getProperty(key)?.let { test.systemProperty(key, it) }
+            }
+        }
+    }
 }
 
 kotlin {
@@ -64,6 +73,10 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.core)
+    testImplementation(platform(libs.compose.bom))
+    testImplementation(libs.compose.ui.test.junit4)
 
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.compose.ui.test.junit4)

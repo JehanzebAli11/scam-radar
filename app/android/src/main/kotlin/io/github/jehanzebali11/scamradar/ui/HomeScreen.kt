@@ -21,6 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.jehanzebali11.scamradar.llm.ModelState
@@ -81,9 +83,11 @@ fun HomeScreen(
                 onReport = if (reportEnabled) onReport else null,
             )
         }
+        Text("Scam Radar works offline. Messages never leave this phone.", style = MaterialTheme.typography.bodySmall)
         Text(
-            "Scam Radar works offline. Messages never leave this phone.\nسکیم ریڈار آف لائن کام کرتا ہے۔ پیغام اس فون سے باہر نہیں جاتے۔",
-            style = MaterialTheme.typography.bodySmall,
+            "سکیم ریڈار آف لائن کام کرتا ہے۔ پیغام اس فون سے باہر نہیں جاتے۔",
+            style = MaterialTheme.typography.bodySmall.copy(textDirection = TextDirection.Rtl, textAlign = TextAlign.Right),
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }

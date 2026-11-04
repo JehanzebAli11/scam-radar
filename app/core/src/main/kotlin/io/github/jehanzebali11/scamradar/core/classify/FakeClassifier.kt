@@ -44,7 +44,7 @@ class FakeClassifier : MessageClassifier {
     }
 
     private companion object {
-        val MONEY = listOf("fee", "fees", "jama", "deposit", "jazzcash", "easypaisa", "transfer", "bhej", "فیس", "روپے بھیج", "رقم بھیج", "registration")
+        val MONEY = listOf("fee", "fees", "jama", "deposit", "jazzcash", "easypaisa", "transfer", "rupay bhej", "paise bhej", "فیس", "روپے بھیج", "رقم بھیج", "registration", "maang", "paise", "paisay", "send money")
         val URGENCY = listOf("urgent", "immediately", "within 24", "jaldi", "fori", "foran", "abhi", "today only", "aaj hi", "فوری", "فوراً", "warna")
         val OFFICIAL = listOf("bank", "bisp", "fbr", "pta", "govt", "government", "support", "helpline", "بینک", "پروگرام")
         val BANK = listOf("bank", "wallet", "account", "atm", "card", "بینک", "کارڈ")
