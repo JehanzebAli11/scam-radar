@@ -23,7 +23,7 @@ MUTED = (150, 170, 190)
 FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 FONT_BOLD = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 FADE_FRAMES = 8
-FOOTER = "Real app UI rendered with Robolectric (not an emulator) · demo mode, no model loaded"
+FOOTER = "Prototype · real app UI rendered with Robolectric, not a phone recording · demo mode"
 
 
 def _font(path: str, size: int) -> ImageFont.FreeTypeFont:
@@ -120,13 +120,10 @@ def main(frames_dir: Path, out: Path) -> None:
             card(
                 "Scam Radar",
                 [
-                    "Offline scam checker for SMS and WhatsApp messages: "
-                    "Urdu, Roman Urdu and English.",
-                    "This walkthrough shows the real app screens, "
-                    "rendered by Robolectric on a computer. "
-                    "It is not an emulator recording.",
-                    "No model file is loaded, so the app runs its keyword stand-in (demo mode). "
-                    "All messages are fictional.",
+                    "Automatic scam warnings for SMS and WhatsApp, in Urdu and English. "
+                    "Checked on the phone, offline.",
+                    "Prototype walkthrough: the real app screens rendered by Robolectric on a "
+                    "computer, not a phone recording. Demo mode, fictional messages.",
                 ],
             ),
             5.0,
@@ -145,11 +142,12 @@ def main(frames_dir: Path, out: Path) -> None:
             card(
                 "Fully offline",
                 [
-                    "No INTERNET permission. Messages are checked on the phone and never stored.",
-                    "Next: push the fine-tuned .litertlm model and record on a real phone.",
+                    "No internet permission. Messages are checked on the phone and never stored.",
+                    "Built for parents and grandparents who may not spot a scam in time.",
+                    "Prototype: not yet on the Play Store.",
                 ],
             ),
-            4.0,
+            5.0,
         )
 
         concat = t / "list.txt"

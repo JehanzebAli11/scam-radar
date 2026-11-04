@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.jehanzebali11.scamradar.llm.ModelState
+import io.github.jehanzebali11.scamradar.notify.ProtectionLog
 
 @Composable
 fun HomeScreen(
@@ -50,6 +51,9 @@ fun HomeScreen(
     onSendToFamily: () -> Unit,
     onReport: () -> Unit,
     onOpenSettings: () -> Unit,
+    protection: ProtectionUi,
+    onTurnOnProtection: () -> Unit,
+    onOpenWarning: (ProtectionLog.Warning) -> Unit,
 ) {
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp, vertical = 14.dp),
@@ -75,10 +79,12 @@ fun HomeScreen(
             }
         }
 
-        // Input
+        ProtectionPanel(protection, onTurnOnProtection, onOpenWarning)
+
+        // Manual check
         Panel {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("Paste a message to check · پیغام پیسٹ کریں", style = MaterialTheme.typography.titleMedium)
+                Text("Check a message yourself · خود چیک کریں", style = MaterialTheme.typography.titleMedium)
                 TextField(
                     value = state.input,
                     onValueChange = onInputChange,

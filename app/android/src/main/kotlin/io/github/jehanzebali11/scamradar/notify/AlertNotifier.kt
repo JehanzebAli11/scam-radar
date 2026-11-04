@@ -41,10 +41,19 @@ object AlertNotifier {
         val card = AdviceText.card(verdict)
         val title =
             when (verdict.severity) {
-                Severity.RED -> "⚠ ${card.headline.ur} · ${card.headline.en}"
-                else -> "${card.headline.ur} · ${card.headline.en}"
+                Severity.RED -> "⚠ ${card.headline.en} · ${card.headline.ur}"
+                else -> "${card.headline.en} · ${card.headline.ur}"
             }
-        val subtitle = card.title?.let { "${it.ur} · ${it.en}" } ?: card.advice.firstOrNull()?.en.orEmpty()
+        val from = msg.sender?.let { "From $it: " }.orEmpty()
+        val what = card.title?.en ?: card.advice.firstOrNull()?.en.orEmpty()
+        val subtitle = "$from$what. Don't reply yet."
+        val big =
+            listOfNotNull(
+                from + what,
+                card.title?.ur,
+                "Don't reply, send money or share codes. Tap to see why.",
+                "جواب نہ دیں، پیسے یا کوڈ نہ بھیجیں۔ وجہ دیکھنے کے لیے ٹیپ کریں۔",
+            ).joinToString("\n")
         val open =
             Intent(context, MainActivity::class.java)
                 .setAction(MainActivity.ACTION_CHECK)
@@ -58,7 +67,7 @@ object AlertNotifier {
                 .setSmallIcon(R.drawable.ic_stat_alert)
                 .setContentTitle(title)
                 .setContentText(subtitle)
-                .setStyle(NotificationCompat.BigTextStyle().bigText(subtitle))
+                .setStyle(NotificationCompat.BigTextStyle().bigText(big))
                 .setColor(if (verdict.severity == Severity.RED) 0xFFB71C1C.toInt() else 0xFFFFA000.toInt())
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE)

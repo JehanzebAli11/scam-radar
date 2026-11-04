@@ -9,15 +9,18 @@ it), so messages cannot leave the phone.
 
 ## What it does
 
-- **Paste box.** Paste or type a message, tap *Check*.
-- **"Share to Scam Radar".** Long-press a message in SMS/WhatsApp, Share,
-  pick Scam Radar. The app opens and checks it right away.
-- **Notification checking (opt-in).** A `NotificationListenerService` reads
-  new notifications from SMS and WhatsApp apps (plus whatever the default SMS
-  app is) and posts a warning for amber and red results. A disclosure screen,
-  in Urdu and English, explains what is read and what happens to it *before*
-  the app opens Android's notification-access settings. An in-app switch turns
-  it off again. Message text is never stored.
+- **Automatic protection (the main feature).** A `NotificationListenerService`
+  checks every new notification from SMS and WhatsApp apps (plus whatever the
+  default SMS app is) and posts a warning for amber and red results, before
+  the person replies. The home screen leads with a big "Turn on protection"
+  button; a disclosure screen in Urdu and English explains what is read and
+  what happens to it *before* Android's notification-access settings open.
+  Once on, the home screen shows how many messages were checked and the recent
+  warnings (kept in memory only). Tapping a warning opens a full-screen result
+  page. Message text is never stored.
+- **"Share to Scam Radar".** Long-press a message, Share, pick Scam Radar; it
+  opens the same full-screen result page.
+- **Check a message yourself.** A paste box with "Try an example" chips.
 - **Rule layer, run before the model** (`core/.../rules/`):
   - **BISP 8171 allowlist.** If the sender id is exactly `8171` and the
     message has no link and does not ask for a code, it is green without

@@ -75,8 +75,11 @@ class MainActivity : ComponentActivity() {
                 else -> null
             }
         if (!text.isNullOrBlank()) {
-            val sender = if (intent.action == ACTION_CHECK) intent.getStringExtra(EXTRA_SENDER) else null
-            vm.checkIncoming(text, sender)
+            if (intent.action == ACTION_CHECK) {
+                vm.checkIncoming(text, intent.getStringExtra(EXTRA_SENDER), Origin.ALERT)
+            } else {
+                vm.checkIncoming(text, null, Origin.SHARED)
+            }
         }
     }
 
@@ -115,9 +118,33 @@ class MainActivity : ComponentActivity() {
         val notifPermission =
             rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { openListenerSettings() }
 
-        BackHandler(enabled = screen != Screen.HOME) { screen = Screen.HOME }
+        val protectionLog by app.protection.state.collectAsStateWithLifecycle()
+        val protection =
+            remember(resumeTick, watch, protectionLog) {
+                ProtectionUi(on = watch && listenerGranted(), checked = protectionLog.checked, warnings = protectionLog.warnings)
+            }
+        val sendToFamily = {
+            state.verdict?.let { v -> ShareIntents.shareText(this, ShareText.forFamily(v, state.checkedText.orEmpty()), "Send to family") }
+            Unit
+        }
 
-        when (screen) {
+        BackHandler(enabled = screen != Screen.HOME || state.showsResultPage) {
+            if (state.showsResultPage) vm.clear() else screen = Screen.HOME
+        }
+
+        val resultVerdict = state.verdict
+        if (state.showsResultPage && resultVerdict != null) {
+            ResultScreen(
+                verdict = resultVerdict,
+                message = state.checkedText.orEmpty(),
+                sender = state.sender,
+                origin = state.origin,
+                reportEnabled = reportEnabled,
+                onSendToFamily = sendToFamily,
+                onReport = { showReport = true },
+                onDone = vm::clear,
+            )
+        } else when (screen) {
             Screen.HOME ->
                 HomeScreen(
                     state = state,
@@ -131,12 +158,12 @@ class MainActivity : ComponentActivity() {
                     },
                     onCheck = vm::check,
                     onClear = vm::clear,
-                    onSendToFamily = {
-                        val v = state.verdict ?: return@HomeScreen
-                        ShareIntents.shareText(this, ShareText.forFamily(v, state.checkedText.orEmpty()), "Send to family")
-                    },
+                    onSendToFamily = sendToFamily,
                     onReport = { showReport = true },
                     onOpenSettings = { screen = Screen.SETTINGS },
+                    protection = protection,
+                    onTurnOnProtection = { screen = Screen.DISCLOSURE },
+                    onOpenWarning = { w -> vm.showWarning(w.sender, w.text, w.verdict) },
                 )
             Screen.SETTINGS -> {
                 val settings =
@@ -163,14 +190,14 @@ class MainActivity : ComponentActivity() {
                     onAgree = {
                         app.prefs.watchNotifications = true
                         watch = true
-                        screen = Screen.SETTINGS
+                        screen = Screen.HOME
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !AlertNotifier.canPost(this)) {
                             notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
                         } else {
                             openListenerSettings()
                         }
                     },
-                    onDecline = { screen = Screen.SETTINGS },
+                    onDecline = { screen = Screen.HOME },
                 )
         }
 

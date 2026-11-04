@@ -38,6 +38,7 @@ class ScamNotificationListener : NotificationListenerService() {
                 if (verdict.severity != Severity.GREEN) {
                     AlertNotifier.show(this@ScamNotificationListener, verdict, msg)
                 }
+                app.protection.record(msg, verdict)
             } catch (e: Exception) {
                 Log.w(TAG, "check failed", e)
             }
