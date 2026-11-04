@@ -158,6 +158,19 @@ cd app && ./gradlew :android:assembleDebug -PscamradarMaxTokens=0
 cd app && ./gradlew :android:assembleDebug
 ```
 
+For a post, turn the results into a 4:5 image and a short clip where the bars
+grow in (memory per export, the one you ship in blue, plus file size and
+accuracy underneath):
+
+```bash
+python export/make_results_chart.py runs/exp/* --ship int4-cache512 --device "Pixel 6a" \
+  --png runs/exp/results.png --mp4 runs/exp/results.mp4
+```
+
+It uses phone PSS when every export has a `device.json`, otherwise the
+computer-side numbers, and says which. `--sample` previews the layout with
+made-up numbers stamped "SAMPLE DATA".
+
 Ship the smallest variant whose eval still passes `--strict`. Quantisation
 tends to hurt rare scam types first, so read the per-type numbers in
 `EVAL.md`, not just the headline.
