@@ -25,7 +25,7 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
-import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.junit4.v2.createEmptyComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -66,29 +66,57 @@ class DemoVideoTest {
 
     @Before fun onlyWhenAsked() = assumeTrue("set -Dscamradar.demoFrames to record", outDir != null)
 
-    private fun frame(name: String, seconds: Double, caption: String) {
+    /** Saves a frame. [tap] marks where a finger is about to press (drawn by make_demo_video.py). */
+    private fun frame(name: String, seconds: Double, caption: String, tap: String? = null) {
         compose.waitForIdle()
         val dir = requireNotNull(outDir).also { it.mkdirs() }
-        fun save(file: String, bmp: Bitmap) = File(dir, file).outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
-        save("$name.png", compose.onRoot(useUnmergedTree = true).captureToImage().asAndroidBitmap())
-        File(dir, "captions.tsv").appendText("$name\t$seconds\t$caption\n")
+        File(dir, "$name.png").outputStream().use {
+            compose.onRoot(useUnmergedTree = true).captureToImage().asAndroidBitmap().compress(Bitmap.CompressFormat.PNG, 100, it)
+        }
+        val at =
+            tap?.let {
+                val b = tag(it).fetchSemanticsNode().boundsInRoot
+                "${b.center.x.toInt()},${b.center.y.toInt()}"
+            }.orEmpty()
+        File(dir, "captions.tsv").appendText("$name\t$seconds\t$caption\t$at\n")
+    }
+
+    private fun press(t: String, name: String, caption: String) {
+        tag(t).performScrollTo()
+        frame(name, 0.7, caption, tap = t)
+        tag(t).performClick()
     }
 
     private fun tag(t: String) = compose.onNode(hasTestTag(t), useUnmergedTree = false)
 
     private fun waitFor(t: String) = compose.waitUntil(10_000) { compose.onAllNodes(hasTestTag(t)).fetchSemanticsNodes().isNotEmpty() }
 
-    private fun typeAndCheck(prefix: String, text: String, result: String, captionTyping: String, captionResult: String) {
-        tag("input").performTextReplacement("")
-        val steps = 6
+    private fun typeAndCheck(
+        prefix: String,
+        text: String,
+        result: String,
+        captionTyping: String,
+        captionResult: String,
+        scrollCaption: String? = null,
+    ) {
+        tag("input").performScrollTo().performTextReplacement("")
+        val steps = 10
         for (i in 1..steps) {
             tag("input").performTextReplacement(text.take(text.length * i / steps))
-            frame("${prefix}_type$i", if (i == steps) 1.5 else 0.25, captionTyping)
+            frame("${prefix}_type%02d".format(i), if (i == steps) 1.2 else 0.12, captionTyping)
         }
-        tag("check").performClick()
+        checkAndShow(prefix, result, captionTyping, captionResult, scrollCaption)
+    }
+
+    private fun checkAndShow(prefix: String, result: String, captionTap: String, captionResult: String, scrollCaption: String?) {
+        press("check", "${prefix}_type99", captionTap)
         waitFor(result)
         tag(result).performScrollTo()
         frame("${prefix}_result", 4.5, captionResult)
+        if (scrollCaption != null) {
+            tag("send-to-family").performScrollTo()
+            frame("${prefix}_result2", 4.0, scrollCaption)
+        }
     }
 
     private fun launch(intent: Intent? = null): ActivityScenario<MainActivity> =
@@ -101,13 +129,16 @@ class DemoVideoTest {
             typeAndCheck(
                 "a01", "Assalam o alaikum bhai, ghalti se mera 6 digit code aap ke number par chala gaya hai. Please woh code mujhe wapis bhej dein, bohat zaroori hai.",
                 "result-red", "Paste a message: the classic 'my code went to your number' scam (Roman Urdu).",
-                "Red card. All advice is pre-written Urdu + English for this scam type, never model text.",
+                "Red card: the verdict, the scam type, and what the message is doing.",
+                scrollCaption = "Clear steps in Urdu and English. All advice is pre-written, never model text.",
             )
-            typeAndCheck(
-                "a02", "Your FictionBank OTP is 000000 for a transaction of Rs 5,000. Do not share this code with anyone. FictionBank will never ask for your OTP.",
-                "result-green", "A genuine bank OTP that says 'do not share'.",
-                "Green: the 'asks for a code' rule ignores 'do not share' messages.",
-            )
+            tag("input").performScrollTo().performTextReplacement("")
+            compose.onNode(androidx.compose.ui.test.hasText("Bank OTP")).performScrollTo()
+            frame("a02_type01", 1.5, "Or tap an example. Here: a genuine bank OTP that says 'do not share'.")
+            compose.onNode(androidx.compose.ui.test.hasText("Bank OTP")).performClick()
+            tag("input").performScrollTo()
+            frame("a02_type02", 1.2, "Or tap an example. Here: a genuine bank OTP that says 'do not share'.")
+            checkAndShow("a02", "result-green", "Or tap an example. Here: a genuine bank OTP that says 'do not share'.", "Green: the 'asks for a code' rule ignores 'do not share' messages.", null)
             typeAndCheck(
                 "a03", "احساس پروگرام: آپ کی 12000 روپے کی امداد منظور ہو گئی ہے۔ فوری طور پر اپنا شناختی کارڈ نمبر اور 500 روپے فیس اس نمبر پر بھیجیں 0300-0000000",
                 "result-red", "Urdu script: fake government aid asking for a fee.",
@@ -129,7 +160,7 @@ class DemoVideoTest {
                 "result-red", "A 'new number, family emergency' scam.",
                 "Red: fake family emergency.",
             )
-            tag("send-to-family").performClick()
+            press("send-to-family", "b01_tap_family", "Warn your family in one tap.")
             compose.waitForIdle()
             scenario.onActivity {
                 val chooser = shadowOf(ApplicationProvider.getApplicationContext<android.app.Application>()).nextStartedActivity
@@ -138,15 +169,15 @@ class DemoVideoTest {
                 val text = send?.getStringExtra(Intent.EXTRA_TEXT).orEmpty()
                 File(requireNotNull(outDir), "b02_share.txt").writeText(text)
             }
-            tag("open-settings").performScrollTo().performClick()
+            press("open-settings", "b02z_tap_settings", "Open Settings.")
             frame("b03_settings", 3.0, "Settings: 'Report this scam' is opt-in and off by default.")
-            tag("report-switch").performClick()
+            press("report-switch", "b03z_tap_switch", "Turn it on.")
             frame("b04_settings_on", 2.0, "Turn it on.")
             compose.onNode(androidx.compose.ui.test.hasText("Back")).performClick()
             waitFor("report")
             tag("report").performScrollTo()
             frame("b05_report_button", 2.5, "Red cards now show 'Report this scam'.")
-            tag("report").performClick()
+            press("report", "b05z_tap_report", "Red cards now show 'Report this scam'.")
             frame("b06_report_dialog", 5.0, "It only prepares the report. Nothing is sent unless you send it yourself.")
         }
     }
@@ -155,7 +186,7 @@ class DemoVideoTest {
     fun c_disclosure() {
         launch().use {
             tag("open-settings").performClick()
-            tag("setup-watching").performClick()
+            press("setup-watching", "c00_tap_setup", "Optional: check new SMS and WhatsApp messages automatically.")
             waitFor("disclosure")
             frame("c01_disclosure", 5.0, "Before asking for notification access: a disclosure of what is read and what happens to it.")
             tag("disclosure-decline").performScrollTo()

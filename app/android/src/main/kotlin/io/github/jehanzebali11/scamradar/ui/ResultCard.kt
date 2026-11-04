@@ -1,53 +1,46 @@
 package io.github.jehanzebali11.scamradar.ui
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.jehanzebali11.scamradar.core.text.AdviceText
-import io.github.jehanzebali11.scamradar.core.text.Bilingual
 import io.github.jehanzebali11.scamradar.core.verdict.Severity
 import io.github.jehanzebali11.scamradar.core.verdict.Verdict
 
-private val UrduStyle = TextStyle(textDirection = TextDirection.Rtl, textAlign = TextAlign.Right)
-
-@Composable
-private fun BilingualText(b: Bilingual, color: Color, urSize: Int, enSize: Int, bold: Boolean = false) {
-    val weight = if (bold) FontWeight.Bold else FontWeight.Normal
-    Text(
-        b.ur,
-        color = color,
-        fontSize = urSize.sp,
-        lineHeight = (urSize * 1.6).sp,
-        fontWeight = weight,
-        style = UrduStyle,
-        modifier = Modifier.fillMaxWidth(),
-    )
-    Text(b.en, color = color, fontSize = enSize.sp, lineHeight = (enSize * 1.3).sp, fontWeight = weight)
-}
-
-/** The big green / amber / red card. Every word on it is pre-written in AdviceText. */
+/**
+ * The big green / amber / red result. A solid header band carries the verdict;
+ * the tinted body carries the advice. Every word comes from AdviceText.
+ */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ResultCard(
@@ -57,50 +50,92 @@ fun ResultCard(
     modifier: Modifier = Modifier,
 ) {
     val card = AdviceText.card(verdict)
-    val colors = severityColors(verdict.severity)
+    val c = severityColors(verdict.severity)
     Card(
         modifier = modifier.fillMaxWidth().testTag("result-${verdict.severity.name.lowercase()}"),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = colors.container, contentColor = colors.content),
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(containerColor = c.tint, contentColor = c.onTint),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
     ) {
-        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            BilingualText(card.headline, colors.content, urSize = 34, enSize = 28, bold = true)
-            card.title?.let { BilingualText(it, colors.content, urSize = 24, enSize = 20, bold = true) }
+        // Header band
+        Column(
+            Modifier.fillMaxWidth().background(c.strong).padding(horizontal = 20.dp, vertical = 22.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                SeverityIcon(verdict.severity, size = 60.dp)
+                Spacer(Modifier.width(16.dp))
+                BilingualText(card.headline.ur, card.headline.en, c.onStrong, urSize = 30, enSize = 24, bold = true, modifier = Modifier.weight(1f))
+            }
+            card.title?.let {
+                Surface(shape = RoundedCornerShape(16.dp), color = c.onStrong.copy(alpha = 0.16f), contentColor = c.onStrong) {
+                    BilingualText(it.ur, it.en, c.onStrong, urSize = 21, enSize = 18, bold = true, modifier = Modifier.fillMaxWidth().padding(14.dp))
+                }
+            }
+        }
 
+        // Body
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             if (card.flagChips.isNotEmpty()) {
+                Text("What we noticed · ہم نے کیا دیکھا", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = c.accent)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     card.flagChips.forEach { chip ->
-                        Surface(shape = RoundedCornerShape(50), color = colors.content.copy(alpha = 0.18f), contentColor = colors.content) {
-                            Text("${chip.ur} · ${chip.en}", Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 15.sp)
+                        Surface(
+                            shape = RoundedCornerShape(50),
+                            color = Color.White,
+                            contentColor = c.accent,
+                            border = BorderStroke(1.dp, c.accent.copy(alpha = 0.35f)),
+                        ) {
+                            Row(Modifier.padding(horizontal = 12.dp, vertical = 7.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Box(Modifier.size(7.dp).clip(CircleShape).background(c.strong))
+                                Text("  ${chip.en} · ${chip.ur}", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                            }
                         }
                     }
                 }
             }
 
-            HorizontalDivider(color = colors.content.copy(alpha = 0.3f))
-            card.advice.forEach { BilingualText(it, colors.content, urSize = 20, enSize = 17) }
-
-            if (verdict.links.isNotEmpty() && verdict.severity != Severity.GREEN) {
-                Text("Links in this message (don't open): " + verdict.links.joinToString { it.host }, color = colors.content, fontSize = 15.sp)
-            }
-            if (!verdict.usedRealModel) {
-                BilingualText(AdviceText.DEMO_MODE, colors.content, urSize = 15, enSize = 14)
-            }
-
-            Button(
-                onClick = onSendToFamily,
-                modifier = Modifier.fillMaxWidth().testTag("send-to-family"),
-                colors = ButtonDefaults.buttonColors(containerColor = colors.content, contentColor = colors.container),
-            ) { Text("گھر والوں کو بھیجیں · Send to family", fontSize = 18.sp) }
-
-            if (onReport != null && verdict.severity != Severity.GREEN) {
-                OutlinedButton(onClick = onReport, modifier = Modifier.fillMaxWidth().testTag("report")) {
-                    Text("رپورٹ تیار کریں · Report this scam", color = colors.content, fontSize = 16.sp)
+            Text("What to do · کیا کریں", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = c.accent)
+            card.advice.forEachIndexed { i, advice ->
+                Row(verticalAlignment = Alignment.Top) {
+                    NumberBadge(i + 1, c.strong, c.onStrong)
+                    Spacer(Modifier.width(12.dp))
+                    BilingualText(advice.ur, advice.en, c.onTint, urSize = 19, enSize = 16, modifier = Modifier.weight(1f))
                 }
             }
 
+            if (verdict.links.isNotEmpty() && verdict.severity != Severity.GREEN) {
+                Surface(shape = RoundedCornerShape(16.dp), color = Color.White, border = BorderStroke(1.dp, c.accent.copy(alpha = 0.3f))) {
+                    Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text("Links found. Don't open them · لنک نہ کھولیں", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = c.accent)
+                        verdict.links.forEach { Text(it.host, fontFamily = FontFamily.Monospace, fontSize = 15.sp, color = Ink) }
+                    }
+                }
+            }
+
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Button(
+                    onClick = onSendToFamily,
+                    modifier = Modifier.fillMaxWidth().height(56.dp).testTag("send-to-family"),
+                    shape = RoundedCornerShape(18.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = if (verdict.severity == Severity.AMBER) Ink else c.strong, contentColor = Color.White),
+                ) { Text("Send to family · گھر والوں کو بھیجیں", fontSize = 17.sp) }
+
+                if (onReport != null && verdict.severity != Severity.GREEN) {
+                    OutlinedButton(
+                        onClick = onReport,
+                        modifier = Modifier.fillMaxWidth().height(52.dp).testTag("report"),
+                        shape = RoundedCornerShape(18.dp),
+                        border = BorderStroke(1.5.dp, c.accent.copy(alpha = 0.6f)),
+                    ) { Text("Report this scam · رپورٹ تیار کریں", color = c.accent, fontSize = 16.sp) }
+                }
+            }
+
+            if (!verdict.usedRealModel) {
+                Text(AdviceText.DEMO_MODE.en, fontSize = 12.sp, color = c.onTint.copy(alpha = 0.6f))
+            }
             verdict.prediction?.let {
-                Text("model: ${it.toLine()}", color = colors.content.copy(alpha = 0.7f), fontSize = 12.sp)
+                Text(it.toLine(), fontFamily = FontFamily.Monospace, fontSize = 11.sp, color = c.onTint.copy(alpha = 0.5f))
             }
         }
     }

@@ -3,12 +3,14 @@ package io.github.jehanzebali11.scamradar.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
@@ -16,8 +18,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.github.jehanzebali11.scamradar.llm.ModelState
 
 data class SettingsState(
@@ -29,6 +34,17 @@ data class SettingsState(
 )
 
 @Composable
+private fun Section(title: String, subtitle: String, content: @Composable () -> Unit) {
+    Panel {
+        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(title, style = MaterialTheme.typography.titleMedium)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            content()
+        }
+    }
+}
+
+@Composable
 fun SettingsScreen(
     s: SettingsState,
     onBack: () -> Unit,
@@ -38,54 +54,52 @@ fun SettingsScreen(
     onReportChange: (Boolean) -> Unit,
 ) {
     Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp, vertical = 14.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Settings", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
-            OutlinedButton(onClick = onBack) { Text("Back") }
+            OutlinedButton(onClick = onBack, shape = RoundedCornerShape(14.dp)) { Text("Back") }
         }
 
-        Text("Model", style = MaterialTheme.typography.titleMedium)
-        Text(
-            when (val m = s.modelState) {
-                ModelState.Loading -> "Loading…"
-                is ModelState.Ready -> "On-device model loaded (${m.backend})."
-                is ModelState.Missing ->
-                    "No model file. Push scamradar.litertlm to one of:\n" + m.lookedIn.joinToString("\n")
-                is ModelState.Failed -> "Model failed to load: ${m.message}"
-            },
-            modifier = Modifier.testTag("model-status"),
-        )
-        OutlinedButton(onClick = onReloadModel) { Text("Look for the model again") }
-
-        HorizontalDivider()
-        Text("Check SMS and WhatsApp notifications", style = MaterialTheme.typography.titleMedium)
-        if (!s.listenerAccessGranted) {
-            Text("Off. Scam Radar needs notification access for this.")
-            Button(onClick = onSetUpWatching, modifier = Modifier.testTag("setup-watching")) { Text("Set up…") }
-        } else {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Check new messages", modifier = Modifier.weight(1f))
-                Switch(checked = s.watchNotifications, onCheckedChange = onWatchChange, modifier = Modifier.testTag("watch-switch"))
+        Section("Model", "The fine-tuned model runs on this phone. Nothing is downloaded.") {
+            val (dot, text) =
+                when (val m = s.modelState) {
+                    ModelState.Loading -> Color(0xFF9E9E9E) to "Loading…"
+                    is ModelState.Ready -> Color(0xFF2E7D32) to "On-device model loaded (${m.backend})."
+                    is ModelState.Missing -> Color(0xFFF59E0B) to "No model file yet, so the app runs in demo mode. Push scamradar.litertlm to one of the paths below."
+                    is ModelState.Failed -> Color(0xFFC62828) to "Model failed to load: ${m.message}"
+                }
+            Row(verticalAlignment = Alignment.Top) {
+                StatusPill(if (s.modelState is ModelState.Ready) "Ready" else "Demo", dot)
             }
-            if (!s.canPostAlerts) Text("Allow notifications for Scam Radar so it can warn you.")
+            Text(text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("model-status"))
+            (s.modelState as? ModelState.Missing)?.lookedIn?.forEach {
+                Text(it, fontFamily = FontFamily.Monospace, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            OutlinedButton(onClick = onReloadModel, shape = RoundedCornerShape(14.dp)) { Text("Look for the model again") }
         }
 
-        HorizontalDivider()
-        Text("Reporting", style = MaterialTheme.typography.titleMedium)
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                "Show \"Report this scam\" on warnings. It only prepares a message for you to review and send yourself.",
-                modifier = Modifier.weight(1f),
-            )
-            Switch(checked = s.reportEnabled, onCheckedChange = onReportChange, modifier = Modifier.testTag("report-switch"))
+        Section("Check SMS and WhatsApp automatically", "Warns you when a new message looks like a scam. Off until you turn it on.") {
+            if (!s.listenerAccessGranted) {
+                Button(onClick = onSetUpWatching, modifier = Modifier.testTag("setup-watching"), shape = RoundedCornerShape(14.dp)) { Text("Set up…") }
+            } else {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Check new messages", modifier = Modifier.weight(1f))
+                    Switch(checked = s.watchNotifications, onCheckedChange = onWatchChange, modifier = Modifier.testTag("watch-switch"))
+                }
+                if (!s.canPostAlerts) Text("Allow notifications for Scam Radar so it can warn you.")
+            }
         }
 
-        HorizontalDivider()
-        Text(
-            "Scam Radar has no internet permission. Messages are checked on this phone and are never stored or uploaded.",
-            style = MaterialTheme.typography.bodySmall,
-        )
+        Section("Report this scam", "Adds a button that prepares a report for you to review and send yourself. Nothing is sent automatically.") {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Show the report button", modifier = Modifier.weight(1f))
+                Spacer(Modifier.width(12.dp))
+                Switch(checked = s.reportEnabled, onCheckedChange = onReportChange, modifier = Modifier.testTag("report-switch"))
+            }
+        }
+
+        Section("Privacy", "Scam Radar has no internet permission. Messages are checked on this phone and are never stored or uploaded.") {}
     }
 }

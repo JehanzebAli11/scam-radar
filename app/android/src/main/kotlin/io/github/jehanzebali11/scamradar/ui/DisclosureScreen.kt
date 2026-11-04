@@ -2,21 +2,26 @@ package io.github.jehanzebali11.scamradar.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -40,33 +45,45 @@ fun DisclosureScreen(onAgree: () -> Unit, onDecline: () -> Unit) {
                 "آپ اسے کسی بھی وقت سکیم ریڈار کی سیٹنگز یا اینڈرائیڈ کی نوٹیفیکیشن ایکسیس سیٹنگز سے بند کر سکتے ہیں۔",
         )
     Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp).testTag("disclosure"),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp, vertical = 14.dp).testTag("disclosure"),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Text("Check messages automatically?", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-        Text(
-            "کیا پیغامات خود بخود چیک کیے جائیں؟",
-            style = MaterialTheme.typography.headlineSmall.copy(textDirection = TextDirection.Rtl, textAlign = TextAlign.Right),
-            modifier = Modifier.fillMaxWidth(),
-        )
-        points.forEach { (en, ur) ->
-            Text(
-                ur,
-                fontSize = 18.sp,
-                lineHeight = 28.sp,
-                style = MaterialTheme.typography.bodyLarge.copy(textDirection = TextDirection.Rtl, textAlign = TextAlign.Right),
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Text("• $en", fontSize = 16.sp)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            RadarLogo(44.dp)
+            Spacer(Modifier.width(12.dp))
+            Text("Before you turn this on", style = MaterialTheme.typography.titleLarge)
+        }
+        Panel {
+            Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("Check messages automatically?", style = MaterialTheme.typography.headlineSmall)
+                Text(
+                    "کیا پیغامات خود بخود چیک کیے جائیں؟",
+                    style = MaterialTheme.typography.headlineSmall.merge(UrduStyle),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
+        Panel {
+            Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
+                points.forEachIndexed { i, (en, ur) ->
+                    Row(verticalAlignment = Alignment.Top) {
+                        NumberBadge(i + 1, MaterialTheme.colorScheme.primaryContainer, Navy)
+                        Spacer(Modifier.width(12.dp))
+                        BilingualText(ur, en, MaterialTheme.colorScheme.onSurface, urSize = 18, enSize = 15, modifier = Modifier.weight(1f))
+                    }
+                }
+            }
         }
         Text(
             "On the next screen, Android will ask you to allow notification access for Scam Radar.",
             fontWeight = FontWeight.SemiBold,
+            fontSize = 15.sp,
+            color = Color(0xFF4A5565),
         )
-        Button(onClick = onAgree, modifier = Modifier.fillMaxWidth().testTag("disclosure-agree")) {
-            Text("I understand, continue · سمجھ گیا، آگے چلیں")
+        Button(onClick = onAgree, modifier = Modifier.fillMaxWidth().height(56.dp).testTag("disclosure-agree"), shape = RoundedCornerShape(18.dp)) {
+            Text("I understand, continue · سمجھ گیا، آگے چلیں", fontSize = 16.sp)
         }
-        OutlinedButton(onClick = onDecline, modifier = Modifier.fillMaxWidth().testTag("disclosure-decline")) {
+        OutlinedButton(onClick = onDecline, modifier = Modifier.fillMaxWidth().height(52.dp).testTag("disclosure-decline"), shape = RoundedCornerShape(18.dp)) {
             Text("Not now · ابھی نہیں")
         }
     }

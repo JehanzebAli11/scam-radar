@@ -22,6 +22,7 @@ FG = (240, 244, 248)
 MUTED = (150, 170, 190)
 FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 FONT_BOLD = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+FADE_FRAMES = 8
 FOOTER = "Real app UI rendered with Robolectric (not an emulator) · demo mode, no model loaded"
 
 
@@ -58,7 +59,7 @@ def card(title: str, lines: list[str]) -> Image.Image:
     return img
 
 
-def framed(screen: Path, caption: str) -> Image.Image:
+def framed(screen: Path, caption: str, tap: tuple[int, int] | None = None) -> Image.Image:
     img = Image.new("RGB", (W, H), BG)
     d = ImageDraw.Draw(img)
     _text_block(d, caption, 60, 40, 44, FG)
@@ -76,13 +77,30 @@ def framed(screen: Path, caption: str) -> Image.Image:
     mask = Image.new("L", shot.size, 0)
     ImageDraw.Draw(mask).rounded_rectangle((0, 0, *shot.size), 36, fill=255)
     img.paste(shot, (x, y), mask)
+    if tap is not None:
+        _touch(img, x + tap[0] * scale, y + tap[1] * scale)
     _text_block(d, FOOTER, H - 90, 24, 80, MUTED)
     return img
 
 
+def _touch(img: Image.Image, cx: float, cy: float) -> None:
+    """A translucent finger-press marker."""
+    overlay = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    o = ImageDraw.Draw(overlay)
+    for r, a in ((62, 50), (44, 90)):
+        o.ellipse((cx - r, cy - r, cx + r, cy + r), fill=(255, 255, 255, a))
+    o.ellipse((cx - 44, cy - 44, cx + 44, cy + 44), outline=(255, 255, 255, 230), width=5)
+    img.paste(Image.alpha_composite(img.convert("RGBA"), overlay).convert("RGB"))
+
+
+def _same_scene(a: str, b: str) -> bool:
+    """Typing frames of one message cut straight to each other; everything else crossfades."""
+    return a.split("_")[0] == b.split("_")[0] and "_type" in a and "_type" in b
+
+
 def main(frames_dir: Path, out: Path) -> None:
     rows = [
-        line.split("\t", 2)
+        line.split("\t")
         for line in (frames_dir / "captions.tsv").read_text(encoding="utf-8").splitlines()
         if line.strip()
     ]
@@ -113,8 +131,16 @@ def main(frames_dir: Path, out: Path) -> None:
             ),
             5.0,
         )
-        for name, seconds, caption in rows:
-            add(framed(frames_dir / f"{name}.png", caption), float(seconds))
+        prev: tuple[str, Image.Image] | None = None
+        for row in rows:
+            name, seconds, caption = row[0], float(row[1]), row[2]
+            tap = tuple(int(v) for v in row[3].split(",")) if len(row) > 3 and row[3] else None
+            img = framed(frames_dir / f"{name}.png", caption, tap)  # type: ignore[arg-type]
+            if prev is not None and not _same_scene(prev[0], name):
+                for i in range(1, FADE_FRAMES + 1):
+                    add(Image.blend(prev[1], img, i / (FADE_FRAMES + 1)), 1 / 30)
+            add(img, seconds)
+            prev = (name, img)
         add(
             card(
                 "Fully offline",
