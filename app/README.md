@@ -57,6 +57,23 @@ How a verdict is made (`core/.../verdict/`):
 | `safe` / `promo` | nothing | green |
 | (model skipped) | sender is 8171, no link, no code request | green (BISP text) |
 
+## Battery and memory
+
+Automatic protection is event-driven, not a background scanner:
+
+- No polling, no foreground service, no wake locks, no alarms. Android calls
+  `ScamNotificationListener.onNotificationPosted` when a notification is
+  posted; notifications from other apps are dropped on the first lines.
+- The model loads only when a message needs checking (or when you open the
+  app), and `ClassifierHolder` unloads it after 5 minutes without a check
+  (`DEFAULT_IDLE_MILLIS`). The next message loads it again.
+- Android keeps the listener bound while access is on, so the app's process
+  may stay in memory, idle, between messages. That is how every notification
+  listener works.
+
+*Not yet measured:* battery use, and how long the first check after an unload
+takes on a real phone (model load time).
+
 ## Layout
 
 ```

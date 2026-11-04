@@ -75,6 +75,7 @@ fun HomeScreen(
             when (modelState) {
                 ModelState.Loading -> StatusPill("Loading model…", Color(0xFF9E9E9E))
                 is ModelState.Ready -> StatusPill("Model ready (${modelState.backend})", Navy)
+                ModelState.Asleep -> StatusPill("Model ready · loads when needed", Navy)
                 is ModelState.Missing, is ModelState.Failed -> StatusPill("Demo mode", Color(0xFFF59E0B), Modifier.testTag("model-banner"))
             }
         }

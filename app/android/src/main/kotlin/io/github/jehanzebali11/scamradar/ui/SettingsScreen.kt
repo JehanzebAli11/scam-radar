@@ -66,12 +66,13 @@ fun SettingsScreen(
             val (dot, text) =
                 when (val m = s.modelState) {
                     ModelState.Loading -> Color(0xFF9E9E9E) to "Loading…"
-                    is ModelState.Ready -> Color(0xFF2E7D32) to "On-device model loaded (${m.backend})."
+                    is ModelState.Ready -> Color(0xFF2E7D32) to "On-device model loaded (${m.backend}). It is unloaded after a few quiet minutes to save memory."
+                    ModelState.Asleep -> Color(0xFF2E7D32) to "Model unloaded to save memory and battery. It loads again when a message needs checking."
                     is ModelState.Missing -> Color(0xFFF59E0B) to "No model file yet, so the app runs in demo mode. Push scamradar.litertlm to one of the paths below."
                     is ModelState.Failed -> Color(0xFFC62828) to "Model failed to load: ${m.message}"
                 }
             Row(verticalAlignment = Alignment.Top) {
-                StatusPill(if (s.modelState is ModelState.Ready) "Ready" else "Demo", dot)
+                StatusPill(if (s.modelState is ModelState.Ready || s.modelState == ModelState.Asleep) "Ready" else "Demo", dot)
             }
             Text(text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("model-status"))
             (s.modelState as? ModelState.Missing)?.lookedIn?.forEach {

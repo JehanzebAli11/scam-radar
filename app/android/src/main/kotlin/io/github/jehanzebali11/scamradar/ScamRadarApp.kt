@@ -16,7 +16,8 @@ class ScamRadarApp : Application() {
         super.onCreate()
         prefs = Prefs(this)
         classifiers = ClassifierHolder(this)
-        classifiers.warmUp()
+        // No warm-up here: when Android starts the process for the notification
+        // listener, the model should load only once a message needs checking.
         AlertNotifier.createChannel(this)
     }
 }

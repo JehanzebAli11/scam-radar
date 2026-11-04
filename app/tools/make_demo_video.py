@@ -143,6 +143,8 @@ def main(frames_dir: Path, out: Path) -> None:
                 "Fully offline",
                 [
                     "No internet permission. Messages are checked on the phone and never stored.",
+                    "Light on battery: no background scanning. It wakes only when a message "
+                    "arrives, and the model unloads when idle.",
                     "Built for parents and grandparents who may not spot a scam in time.",
                     "Prototype: not yet on the Play Store.",
                 ],

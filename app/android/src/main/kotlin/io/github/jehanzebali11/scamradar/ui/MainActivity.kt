@@ -50,6 +50,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        // The user opened the app, so a paste check is likely: load the model now.
+        app.classifiers.warmUp()
         if (savedInstanceState == null) handleIntent(intent)
         setContent {
             ScamRadarTheme {
