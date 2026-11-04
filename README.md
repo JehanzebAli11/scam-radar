@@ -74,6 +74,9 @@ train pool ───────────────────────
    with a rule layer in front of the model and pre-written Urdu/English
    advice cards.
 
+Picking the project up? Start with [`HANDOVER.md`](HANDOVER.md): status,
+what is verified, decisions and next steps.
+
 ## Quickstart
 
 Needs Python 3.11 or newer.
